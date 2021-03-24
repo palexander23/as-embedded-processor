@@ -1,0 +1,8 @@
+**/*db/**
+output_files/**
+xcelium.d/**
+
+*.qsf
+*.qws
+*.history
+*.log
