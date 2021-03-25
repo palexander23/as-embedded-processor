@@ -174,6 +174,19 @@ initial
     check_alu_output(`RADD, 125, 3, 120, 4'b0001);
     //----------END TEST IMM ADD----------//
 
+    reset_inputs();
+
+    //----------------RMULL---------------//
+    // Basic multiplication
+    check_alu_output(`RMULL, 2, 2, 4, 4'b0000);
+
+    // Multiplication by negative
+    check_alu_output(`RMULL, 2, -2, -4, 4'b0100);
+
+    // Check that only bottom half makes it to output
+    check_alu_output(`RMULL, 8'b00000011, 8'b10000000, 8'b10000000, 4'b0100);
+    //--------------END RMULL-------------//
+
     if (error_count == 0) $display("No errors were recorded!");
     else                  $error("%1d errors were reported!", error_count);
   end

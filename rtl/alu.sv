@@ -57,7 +57,7 @@ always_comb
 
 // create an n-bit adder 
 // and then build the ALU around the adder
-logic[n-1:0] ar,b1; // temp signals
+logic [n-1:0] ar,b1; // temp signals
 always_comb
 begin
    if(func==`RSUB)
@@ -65,6 +65,10 @@ begin
    else b1 = b;
     ar = a+b1; // n-bit adder
 end // always_comb
+
+// Create an n-bit multiplier
+logic [n-1:0] mr; 
+assign mr = a*b;
    
 // create the ALU, use signal ar in arithmetic operations
 always_comb
@@ -99,6 +103,12 @@ always_comb
         
         // C - note: picoMIPS inverts carry when subtracting
         flags[0] = a[7] & ~b[7] |  a[7] & result[7] | ~b[7] & result[7];
+      end
+
+
+      // Arithmetic multiplication
+      `RMULL  : begin
+        result = mr[7:0]; // take lower half of multiplication result
       end   
     
     endcase
