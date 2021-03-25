@@ -9,14 +9,51 @@
 
 `include "alucodes.sv"  
 module alu #(parameter n=8) (
-   input logic [n-1:0] a, b, // ALU operands
-   input logic [2:0] func, // ALU function code
-   output logic [3:0] flags, // ALU flags V,N,Z,C
-   output logic [n-1:0] result // ALU result
+   input logic [n-1:0] a_in, b_in,  // ALU operands
+   input logic [2:0] func,          // ALU function code
+   input logic [1:0] a_sel, b_sel,  // ALU input selection
+   input logic [8:0] switches,      // External switches for I/O
+   input logic [n-1:0] immidiate,   // Immediate value from instruction
+   output logic [3:0] flags,        // ALU flags V,N,Z,C
+   output logic [n-1:0] result      // ALU result
 );       
 //------------- code starts here ---------
 
 timeunit 1ns; timeprecision 10ps;
+
+logic [n-1:0] a, b;
+
+// Multiplexer for A input
+always_comb
+  begin
+    // Set default value for A
+    a = a_in;
+
+    // Multiplex input
+    case (a_sel)
+      `REG:     a = a_in;
+      `SW_7_0:  a = switches[7:0];
+      `SW_8:    a = {n{switches[8]}};
+    endcase 
+
+  end //always_comb
+
+
+// Multiplexer for B input
+always_comb
+  begin
+    // Set default value for B
+    b = b_in;
+
+    // Multiplex input
+    case (b_sel)
+      `REG:     b = b_in;
+      `SW_7_0:  b = switches[7:0];
+      `SW_8:    b = {n{switches[8]}};
+      `IMM:     b = immidiate;
+    endcase 
+
+  end //always_comb
 
 // create an n-bit adder 
 // and then build the ALU around the adder
