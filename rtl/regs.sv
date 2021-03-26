@@ -42,4 +42,4 @@ always_comb
   end	
 
 
-endmodule // module regs
+endmodule // regs

@@ -13,7 +13,7 @@ module alu #(parameter n=8) (
    input logic [2:0] func,          // ALU function code
    input logic [1:0] a_sel, b_sel,  // ALU input selection
    input logic [8:0] switches,      // External switches for I/O
-   input logic [n-1:0] immidiate,   // Immediate value from instruction
+   input logic [n-1:0] immediate,   // Immediate value from instruction
    output logic [3:0] flags,        // ALU flags V,N,Z,C
    output logic [n-1:0] result      // ALU result
 );       
@@ -50,7 +50,7 @@ always_comb
       `REG:     b = b_in;
       `SW_7_0:  b = switches[7:0];
       `SW_8:    b = {n{switches[8]}};
-      `IMM:     b = immidiate;
+      `IMM:     b = immediate;
     endcase 
 
   end //always_comb

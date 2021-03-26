@@ -8,7 +8,9 @@
 //-----------------------------------------------------
 module prog #(parameter p_size = 6, i_size = 24) // p_size - address width, i_size - instruction width
 (input logic [p_size-1:0] address,
-output logic [i_size:0] instr); // I - instruction code
+output logic [i_size-1:0] instr); // I - instruction code
+
+timeunit 1ns; timeprecision 10ps;
 
 // program memory declaration, note: 1<<n is same as 2^n
 logic [i_size:0] prog_mem[ (1<<p_size)-1:0];

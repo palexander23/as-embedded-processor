@@ -1,0 +1,12 @@
+# Basic Test Program
+# This is the program that is run by the basic testbench for the CPU
+# It tests each instruction individually.
+# It does not run the program given in the spec.
+
+ADDI %3 %0 60           # 60 -> %3       
+ADDI %4 %0 54           # 54 -> %4
+
+ADD  %3 %4              # %3 = %3 + %4 = 60+54 = 114
+NOP
+
+ADDI %3 %0 -49          # %3 = %3 + -49 = 114 - 49 = 65
