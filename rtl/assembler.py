@@ -135,10 +135,17 @@ def token_to_bin(tokens, opcode_dict):
         binary_token_line.append(rs_bin)
 
         # Add the imm token
-        if len(binary_token_line) < 4:
+        if len(token_line) < 4:
             imm_bin = "{:08b}".format(0)
         else:
-            imm_bin = "{:08b}".format(token_line[3])
+            imm = int(token_line[3])
+
+            # Format the immediate value in 2's compliment
+            if imm < 0:
+                imm_bin = "{:08b}".format(255 + imm + 1)
+                print(imm_bin) 
+            else:   
+                imm_bin = "{:08b}".format(imm)
 
         binary_token_line.append(imm_bin)
 
@@ -166,7 +173,7 @@ def bin_to_hex(binary_token_list: list):
         int_representation = int(binary_string, base=2)
 
         # Format int representation as hex string
-        hex_string = "{:05X}".format(int_representation)
+        hex_string = "{:06X}".format(int_representation)
 
         hex_list.append(hex_string)
         bin_string_list.append(binary_string)
