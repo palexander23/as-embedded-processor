@@ -62,7 +62,19 @@ def get_program_tokens(file_name="./prog.a") -> list:
             prog_line_numbers.append(idx + 1)
 
     # Split those lines into tokens 
-    prog_tokens = [line.split() for line in filtered_prog_lines]
+    prog_tokens = []
+
+    for line in filtered_prog_lines:
+        tokens = line.split() 
+
+        # Remove inline comments
+        if '#' in tokens:
+            comment_start_idx = tokens.index("#")
+            prog_tokens.append(tokens[:comment_start_idx])
+
+        else:
+            prog_tokens.append(tokens)
+
 
     return prog_tokens, prog_line_numbers, filtered_prog_lines
 
@@ -143,7 +155,6 @@ def token_to_bin(tokens, opcode_dict):
             # Format the immediate value in 2's compliment
             if imm < 0:
                 imm_bin = "{:08b}".format(255 + imm + 1)
-                print(imm_bin) 
             else:   
                 imm_bin = "{:08b}".format(imm)
 
@@ -205,7 +216,7 @@ def output_program(hex_list, bin_string_list, prog_strings):
 def main():
     opcode_dict, opcode_list, op_binary_list = get_opcodes()
 
-    # Retrieve tokens from input file
+    # Retrieve tokens from input file. Remove inline comments
     prog_tokens, prog_line_numbers, prog_strings = get_program_tokens()
 
     # Do basic syntax check
@@ -224,4 +235,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
