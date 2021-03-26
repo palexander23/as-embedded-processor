@@ -7,8 +7,7 @@
 -----------------------------------------------------
 """
 
-from os import O_APPEND
-
+import sys
 
 def get_opcodes() -> dict:
     """Parse the possible opcodes and their binary representation from
@@ -192,7 +191,7 @@ def bin_to_hex(binary_token_list: list):
     return hex_list, bin_string_list
 
 
-def output_program(hex_list, bin_string_list, prog_strings):
+def output_program(hex_list, bin_string_list, prog_strings, out_file_path="./prog.hex"):
     """Generate the lines to write to the hex file and write them to prog.hex.
     Binary representation of each line and original line from .a file written 
     next to each hex value.
@@ -209,15 +208,23 @@ def output_program(hex_list, bin_string_list, prog_strings):
 
         output_lines.append(output_line)
 
-    with open("prog.hex", "w") as output_file:
+    with open(out_file_path, "w") as output_file:
         output_file.writelines(output_lines)
 
 
 def main():
+
+    # Get the set of possible opcodes from the systemverilog files
+    # that define the processor
     opcode_dict, opcode_list, op_binary_list = get_opcodes()
 
+    # If a file name was passed as a cli argument use that as the .a file.
+    asm_file_path = "./prog.a"
+    if len(sys.argv) > 1:
+        asm_file_path = sys.argv[1]
+
     # Retrieve tokens from input file. Remove inline comments
-    prog_tokens, prog_line_numbers, prog_strings = get_program_tokens()
+    prog_tokens, prog_line_numbers, prog_strings = get_program_tokens(asm_file_path)
 
     # Do basic syntax check
     check_token_syntax(prog_tokens, opcode_list, prog_line_numbers)
@@ -229,9 +236,12 @@ def main():
     hex_list, bin_string_list = bin_to_hex(binary_token_list)
 
     # Output the assembled program to prog.hex 
-    output_program(hex_list, bin_string_list, prog_strings)
-
-
+    # Check if a cli argument has been given for the output file
+    out_file_path = "./prog.hex"
+    if len(sys.argv) > 2:
+        out_file_path = sys.argv[2]
+        
+    output_program(hex_list, bin_string_list, prog_strings, out_file_path)
 
 if __name__ == "__main__":
     main()
