@@ -42,6 +42,9 @@ initial
             $display("Expected: %24b\tActual: %24b\n", prog_mem[i], instr);
           end // assert
       end // for
+      
+    if (error_count == 0) $display("No errors were recorded!");
+    else                  $error("%1d errors were reported!", error_count);
     
   end // initial
 
