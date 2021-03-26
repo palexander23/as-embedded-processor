@@ -107,7 +107,7 @@ initial
       end
     //--------------END R0 == 0 TEST----------------//
 
-      
+
     if (error_count == 0) $display("No errors were recorded!");
     else                  $error("%1d errors were reported!", error_count);
 
