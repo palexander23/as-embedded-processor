@@ -11,3 +11,4 @@
 `define MULL    6'b100100
 `define BEQ     6'b010011
 `define BNE     6'b011011
+`define MOV     6'b110001

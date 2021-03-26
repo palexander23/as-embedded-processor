@@ -14,7 +14,7 @@ module decoder(
     input logic [5:0] opcode,           // Opcode from instruction
     input logic [3:0] alu_flags,        // ALU flags
 
-    output logic [1:0] a_sel, b_sel,    // Contols for ALU input locations
+    output logic imm,                   // Selects imm as ALU B inputns
     output logic [2:0] alu_func,        // Control signals for ALU
     output logic w,                     // Write enable for registers
     output logic pc_incr, pc_relbranch  // Controls for program counter
@@ -22,16 +22,15 @@ module decoder(
 
 timeunit 1ns; timeprecision 10ps;
 
+// Control flag generation
 always_comb
   begin
     // Set default values for all signals
     pc_incr = 1'b1;
     pc_relbranch = 1'b1;
 
-    a_sel = `REG;
-    b_sel = `REG;
-
     w = 1'b0;
+    imm = 1'b0;
 
     // Route lower half of opcode to ALU as alufunc
     alu_func = opcode[2:0];
@@ -42,11 +41,14 @@ always_comb
 
       `ADDI:  begin           
                 w = 1'b1;     // Enable register write back 
-                b_sel = `IMM; // Set B input of ALU to immidiate value
+                imm = 1'b1;
       end
+
+      `MOV:     w = 1'b1;     // Enable write back
       
       default:  $error("Unimplemented Opcode: %6d", opcode);
     endcase
 
-  end // initial
+  end // always_comb
+
 endmodule // prog

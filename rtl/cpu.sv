@@ -5,6 +5,8 @@
 // Last revised: 26/03/2021
 //------------------------------------
 
+`include "alucodes.sv"
+
 module cpu #( parameter n = 8)
 (input logic clk, n_reset,
     input logic [8:0] sw,
@@ -23,6 +25,7 @@ logic [2:0] alu_func;
 logic [1:0] a_sel, b_sel;
 logic [3:0] alu_flags;
 logic [n-1:0] alu_result;
+logic imm;
 
 // PC 
 parameter p_size = 6;
@@ -37,12 +40,11 @@ logic [i_size-1:0] instr;
 decoder d0 (
     .opcode(instr[i_size-1:i_size-6]),
     .alu_flags(alu_flags),
-    .a_sel(a_sel),
-    .b_sel(b_sel),
     .alu_func(alu_func),
     .w(w),
     .pc_incr(pc_incr),
-    .pc_relbranch(pc_relbranch)
+    .pc_relbranch(pc_relbranch),
+    .imm(imm)
 );
 
 // Instantiate Modules
@@ -64,7 +66,8 @@ alu #(.n(n)) alu0 (
     .switches(sw),
     .immediate(instr[n-1:0]),
     .flags(alu_flags),
-    .result(alu_result)
+    .result(alu_result),
+    .imm(imm)
 );
 
 regs #(8) r0 (
@@ -82,6 +85,25 @@ prog #(.p_size(p_size), .i_size(i_size)) prog0 (
     .address(pc_out),
     .instr(instr)
 );
+
+always_comb 
+  begin
+    // ALU A input selection
+    case(instr[i_size-7:i_size-11])
+        5'b00001: a_sel = `SW_7_0;
+        5'b00010: a_sel = `SW_8;
+
+        default: a_sel = `REG;
+    endcase
+
+    // ALU B input selection
+    case(instr[i_size-12:i_size-16])
+        5'b00001: b_sel = `SW_7_0;
+        5'b00010: b_sel = `SW_8;
+
+        default: b_sel = `REG;
+    endcase
+  end
 
 // Route ALU output to LEDs
 assign leds = alu_result;
