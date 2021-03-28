@@ -8,11 +8,16 @@
 `include "alucodes.sv"
 
 module cpu #( parameter n = 8, p_size = 6, i_size = 24)
-(input logic clk, n_reset,
-    input logic [8:0] sw,
-    output logic [n-1:0] leds);
+(input logic clk,
+    input logic [9:0] SW,
+    output logic [n-1:0] LED);
 
 timeunit 1ns; timeprecision 10ps;
+
+// Active Low reset
+// Brought in on SW[9]
+logic n_reset;
+assign n_reset = SW[9];
 
 // Internal connecting signals for each module
 // Registers
@@ -59,7 +64,7 @@ alu #(.n(n)) alu0 (
     .func(alu_func),
     .a_sel(a_sel),
     .b_sel(b_sel),
-    .switches(sw),
+    .switches(SW),
     .immediate(instr[n-1:0]),
     .flags(alu_flags),
     .result(alu_result),
@@ -102,6 +107,6 @@ always_comb
   end
 
 // Route ALU output to LEDs
-assign leds = alu_result;
+assign LED = alu_result;
 
 endmodule

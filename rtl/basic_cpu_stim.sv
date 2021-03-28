@@ -6,17 +6,26 @@ parameter n = 8;
 
 // cpu inputs
 logic clk, n_reset;
+logic [9:0] SW;
+
+// User programable switches 
 logic [8:0] sw;
+
+assign SW[8:0] = sw;
 
 // cpu outputs
 logic [n-1:0] leds;
 
+// Assign the active low reset to SW[9]
+assign SW[9] = n_reset;
+
+// Assign the 
+
 // cpu instance
 cpu #(.n(n)) c0 (
   .clk(clk),
-  .n_reset(n_reset),
-  .sw(sw),
-  .leds(leds)
+  .SW(SW),
+  .LED(leds)
 );
 
 // Error and test counters
