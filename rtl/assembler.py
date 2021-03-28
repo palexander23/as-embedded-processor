@@ -7,6 +7,7 @@
 -----------------------------------------------------
 """
 
+from os import error
 import sys
 
 def get_opcodes() -> dict:
@@ -56,7 +57,7 @@ def get_program_tokens(file_name="./prog.a") -> list:
     prog_line_numbers = []
 
     for idx, line in enumerate(prog_lines):
-        if line[0] not in ["#", "\n", "\n\r"]:
+        if line[0] not in ["#", "\n", "\n\r", " "]:
             filtered_prog_lines.append(line)
             prog_line_numbers.append(idx + 1)
 
@@ -90,25 +91,30 @@ def check_token_syntax(token_list: list, opcode_list: list, line_nums: list):
     errors_found = 0
 
     for idx, line_tokens in enumerate(token_list):
-
-        # Check the opcode is valid
-        if line_tokens[0] not in opcode_list:
-            errors_found += 1
-            print("Syntax Error Line {:3d}: Invalid Opcode".format(line_nums[idx]))
-
-        # Check for correct token number
-        if line_tokens[0] == "NOP":
-            if len(line_tokens) > 1:
+        try:
+            # Check the opcode is valid
+            if line_tokens[0] not in opcode_list:
                 errors_found += 1
-                print("Syntax Error Line {:3d}: NOP Has Arguments".format(line_nums[idx]))
-            
-        elif len(line_tokens) not in [3,4]:
+                print("Syntax Error Line {:3d}: Invalid Opcode".format(line_nums[idx]))
+
+            # Check for correct token number
+            if line_tokens[0] == "NOP":
+                if len(line_tokens) > 1:
+                    errors_found += 1
+                    print("Syntax Error Line {:3d}: NOP Has Arguments".format(line_nums[idx]))
+                
+            elif len(line_tokens) not in [3,4]:
+                errors_found += 1
+                print("Syntax Error Line {:3d}: Too Many Arguments".format(line_nums[idx]))
+                
+        except:
             errors_found += 1
-            print("Syntax Error Line {:3d}: Too Many Arguments".format(line_nums[idx]))
+            print("Syntax Error Line {:3d}: Unexpected error".format(line_nums[idx]))
              
     if errors_found > 0:
         print("\nAssembly Failed!")
         print("Errors Found: {}".format(errors_found))
+        exit()
 
 
 def token_to_bin(tokens, opcode_dict):
