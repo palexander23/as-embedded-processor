@@ -1,0 +1,29 @@
+# Application Software
+
+# This code defines the software defined in the pseudocode in the project spec.
+# The overall functionality is to read two numbers from the switches on the FPGA 
+# and multiply them together.
+# 
+# A handshaking protocol is implemented using SW[8] one of the switches and the 
+# result of the output is displayed on the FPGA LEDs, routed from the ALU output.
+
+ADDI  %8 %0 0       # Set R8 = 0
+                    # Not strictly necessary as n_reset sets all registers to 0.
+
+# Loop:
+# Get first number
+BEQ  %2 %0 0        # Hold here until SW[8] becomes 1
+MOV  %6 %1          # Input an 8-bit number from SW[7:0] to R6
+
+# Get second number
+BNE  %2 %0 0        # Hold here until SW[8] becomes 0
+BEQ  %2 %0 0        # Hold here until SW[8] becomes 1
+MOV  %5 %1          # Input an 8-bit number from S[7:0] to R5 
+
+# Perform MAC operation
+MULL %6 %5          # R6 = R5*R6
+ADD  %8 %6          # R8 = R6+R6 = R8 + R5*R6
+
+# Perform final handshake and return to beginning of the loop
+BNE  %2 %0 0        # Hold here until SW[8] becomes 0
+BEQ  %0 %0 -8       # Unconditional branch to beginning of the loop

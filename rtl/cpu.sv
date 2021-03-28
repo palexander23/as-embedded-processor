@@ -64,7 +64,7 @@ alu #(.n(n)) alu0 (
     .func(alu_func),
     .a_sel(a_sel),
     .b_sel(b_sel),
-    .switches(SW),
+    .switches(SW[8:0]),
     .immediate(instr[n-1:0]),
     .flags(alu_flags),
     .result(alu_result),
