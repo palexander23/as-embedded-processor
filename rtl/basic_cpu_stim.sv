@@ -486,7 +486,7 @@ initial
 
     clock();
 
-    assert(c0.pc_out == 21)
+    assert(c0.pc_out == 21) else
       begin
         error_count = error_count + 1;
         $display("\nTest %2d Failed!", test_count);
@@ -500,7 +500,7 @@ initial
 
     clock();
 
-    assert(c0.pc_out == 22)
+    assert(c0.pc_out == 22) else
       begin
         error_count = error_count + 1;
         $display("\nTest %2d Failed!", test_count);
@@ -512,7 +512,7 @@ initial
     // Check PC will now loop waiting for SW[8] -> 1
     clock();
 
-    assert(c0.pc_out == 22)
+    assert(c0.pc_out == 22) else
       begin
         error_count = error_count + 1;
         $display("\nTest %2d Failed!", test_count);
@@ -526,7 +526,7 @@ initial
 
     clock();
 
-    assert(c0.pc_out == 23)
+    assert(c0.pc_out == 23) else
       begin
         error_count = error_count + 1;
         $display("\nTest %2d Failed!", test_count);
