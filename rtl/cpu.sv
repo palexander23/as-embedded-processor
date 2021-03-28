@@ -7,7 +7,7 @@
 
 `include "alucodes.sv"
 
-module cpu #( parameter n = 8)
+module cpu #( parameter n = 8, p_size = 6, i_size = 24)
 (input logic clk, n_reset,
     input logic [8:0] sw,
     output logic [n-1:0] leds);
@@ -27,12 +27,10 @@ logic [n-1:0] alu_result;
 logic imm;
 
 // PC 
-parameter p_size = 6;
 logic pc_incr, pc_relbranch;
 logic [p_size-1:0] pc_out;
 
 // Program Memory
-parameter i_size = 24;
 logic [i_size-1:0] instr;
 
 decoder d0 (
@@ -51,7 +49,7 @@ pc #(.p_size(p_size)) pc0 (
     .n_reset(n_reset),
     .pc_incr(pc_incr),
     .pc_relbranch(pc_relbranch),
-    .branch_addr(instr[n-1:0]),
+    .branch_addr(instr[p_size-1:0]),
     .pc_out(pc_out)
 );
 

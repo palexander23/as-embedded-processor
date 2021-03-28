@@ -4,7 +4,7 @@
 // Version: 1.1,  Reduced to 4 core funcs
 // Original Author  :   tjk
 // Modified By      :   Peter Alexander
-// Last rev. 24 Mar 2021
+// Last rev. 24 Mar 2021]
 //-----------------------------------------------------
 
 `include "alucodes.sv"  
@@ -35,6 +35,8 @@ always_comb
       `REG:     a = a_in;
       `SW_7_0:  a = switches[7:0];
       `SW_8:    a = {n{switches[8]}};
+
+      default:  a = `REG;
     endcase 
 
   end //always_comb
@@ -51,6 +53,8 @@ always_comb
       `REG:     b = b_in;
       `SW_7_0:  b = switches[7:0];
       `SW_8:    b = {n{switches[8]}};
+
+      default:  b = `REG;
     endcase
 
     if(imm == 1'b1)
@@ -112,7 +116,9 @@ always_comb
       // Arithmetic multiplication
       `RMULL  : begin
         result = mr[7:0]; // take lower half of multiplication result
-      end   
+      end
+
+      default: $error("Unsupported ALU function given: %3b", func);
     
     endcase
 	 

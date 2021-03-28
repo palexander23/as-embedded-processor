@@ -13,7 +13,7 @@ output logic [i_size-1:0] instr); // I - instruction code
 timeunit 1ns; timeprecision 10ps;
 
 // program memory declaration, note: 1<<n is same as 2^n
-logic [i_size:0] prog_mem[ (1<<p_size)-1:0];
+logic [i_size-1:0] prog_mem[ (1<<p_size)-1:0];
 
 // get memory contents from file
 initial
