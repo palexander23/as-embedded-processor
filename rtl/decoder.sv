@@ -27,7 +27,7 @@ always_comb
   begin
     // Set default values for all signals
     pc_incr = 1'b1;
-    pc_relbranch = 1'b1;
+    pc_relbranch = 1'b0;
 
     w = 1'b0;
     imm = 1'b0;
@@ -36,15 +36,26 @@ always_comb
     alu_func = opcode[2:0];
 
     case(opcode)
-      `NOP: ;                 // Do nothing
-      `ADD:     w = 1'b1;     // Enable register write back
+      `NOP: ;                                     // Do nothing
+      `ADD, `MOV, `MULL:  w = 1'b1;               // Enable register write back
 
       `ADDI:  begin           
-                w = 1'b1;     // Enable register write back 
-                imm = 1'b1;
+                          w = 1'b1;               // Enable register write back 
+                          imm = 1'b1;
       end
 
-      `MOV:     w = 1'b1;     // Enable write back
+
+      `BEQ:   if(alu_flags[1] == 1'b1) begin      // If ALU Zero flag is set
+                          pc_incr = 1'b0;         // Enable relative branching in PC
+                          pc_relbranch = 1'b1;
+      end
+
+
+      `BNE:   if(alu_flags[1] == 1'b0) begin      // If ALU Zero flag is NOT set
+                          pc_incr = 1'b0;         // Enable relative branching in PC
+                          pc_relbranch = 1'b1;
+      end
+
       
       default:  $error("Unimplemented Opcode: %6d", opcode);
     endcase

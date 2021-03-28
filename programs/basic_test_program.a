@@ -3,16 +3,40 @@
 # It tests each instruction individually.
 # It does not run the program given in the spec.
 
+# Arithmetic Tests
 ADDI %3 %0 60           # 60 -> %3       
 ADDI %4 %0 54           # 54 -> %4
-
 ADD  %3 %4              # %3 = %3 + %4 = 60+54 = 114
-NOP
 
+# NOP Test
+NOP
 ADDI %3 %0 -49          # %3 = %3 + -49 = 114 - 49 = 65
 
+# Switch Read Test
 MOV  %5 %1              # SW[7:0] -> %5
 MOV  %6 %1              # SW[7:0] -> %6
 MOV  %7 %2              # Sw[8] -> %7
 
+# Multiplication Test
 MULL %6 %5              # %6 = %5 * %6
+
+# Branching Tests
+ADDI %12 %0 50          # 50 -> %12
+ADDI %13 %0 50          # 50 -> %13
+
+BNE  %12 %13 2          # Don't Branch %12 == %13
+BEQ  %12 %13 4          # Branch over NOPs
+NOP
+NOP
+NOP
+
+BEQ  %12 %5 2           # Don't Branch %12 != %5
+BNE  %12 %5 4           # Branch over NOPs 
+NOP
+NOP
+NOP
+
+# Branch on switch input Test
+BEQ %2 %0 -1             # Loop on this instruction until SW[8] > 1
+BNE %2 %0 0             # Loop on this instruction until SW[8] == 0
+

@@ -17,7 +17,6 @@ timeunit 1ns; timeprecision 10ps;
 // Internal connecting signals for each module
 // Registers
 logic w;
-logic Rd, Rs;
 logic [n-1:0] Rd_data, Rs_data;
 
 // ALU
@@ -30,7 +29,6 @@ logic imm;
 // PC 
 parameter p_size = 6;
 logic pc_incr, pc_relbranch;
-logic [p_size-1:0] pc_branch_addr;
 logic [p_size-1:0] pc_out;
 
 // Program Memory
@@ -53,7 +51,7 @@ pc #(.p_size(p_size)) pc0 (
     .n_reset(n_reset),
     .pc_incr(pc_incr),
     .pc_relbranch(pc_relbranch),
-    .branch_addr(pc_branch_addr),
+    .branch_addr(instr[n-1:0]),
     .pc_out(pc_out)
 );
 

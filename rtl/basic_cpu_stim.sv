@@ -330,7 +330,7 @@ initial
 
 
     //-------------------INSTR 7--------------------//
-    // Set SW[7:0] to 30 and read switches into R5
+    // Set SW[8] to 1 and read it into %7
     #1000 sw[8] = 1'b1;
 
     #1000 assert(c0.alu_result == 8'b11111111 && leds == 8'b11111111) else
@@ -365,6 +365,177 @@ initial
       test_count = test_count + 1; 
     //-----------------END INSTR 7------------------//
 
+
+    //-------------------INSTR 8--------------------//
+    // Multiply R6(-3) and R5(30) and place in R6(-90)
+
+     assert(c0.alu_result == 8'b10100110 && leds == 8'b10100110) else
+      begin
+        error_count = error_count + 1;
+        $display("\nTest %2d Failed!", test_count);
+        $display("ALU output was not -90 before 7th instruction clock");
+        $display("Expected: %8b\tActual: %8b\n", 8'b10100110, c0.alu_result);
+      end
+      test_count = test_count + 1; 
+
+    // Run the first instruction
+    clock();
+    
+    // Check PC has incremented
+    assert(c0.pc_out == 9) else
+      begin
+        error_count = error_count + 1;
+        $display("\nTest %2d Failed!", test_count);
+        $display("PC did not increment on 8th instruction");
+        $display("Expected: %8b\tActual: %8b\n", 9, c0.pc_out);
+      end
+      test_count = test_count + 1; 
+
+    assert(c0.r0.gpr[6] == 8'b10100110) else
+      begin
+        error_count = error_count + 1;
+        $display("\nTest %2d Failed!", test_count);
+        $display("R6 did not go to 8'b10100110 after instruction 8 was clocked");
+        $display("Expected: %8b\tActual: %8b\n", 8'b10100110, c0.r0.gpr[6]);
+      end
+      test_count = test_count + 1; 
+    //-----------------END INSTR 8------------------//
+
+
+    //----------------BRANCHING TEST----------------//
+    // Clock three times to perform three ADDI instructions
+    clock();
+    clock();
+    // Check the PC is where it should be 
+    assert(c0.pc_out == 11) else
+      begin
+        error_count = error_count + 1;
+        $display("\nTest %2d Failed!", test_count);
+        $display("PC was not at expected value before branching tests");
+        $display("Expected: %3d\tActual: %3d\n", 11, c0.pc_out);        
+      end
+    test_count = test_count + 1;
+
+    // Check clocking only increments PC
+    clock();
+    assert(c0.pc_out == 12) else
+      begin
+        error_count = error_count + 1;
+        $display("\nTest %2d Failed!", test_count);
+        $display("PC did not increment correctly after failed BNE branch");
+        $display("Expected: %3d\tActual: %3d\n", 12, c0.pc_out);        
+      end
+    test_count = test_count + 1;
+
+    // Check next clock causes successful BEQ branch
+    assert(c0.pc_relbranch == 1'b1 && c0.pc_incr == 1'b0) else
+      begin
+        error_count = error_count + 1;
+        $display("\nTest %2d Failed!", test_count);
+        $display("pc_relbranch was not set on successful branch");       
+      end
+    test_count = test_count + 1;
+
+    clock();
+
+    assert(c0.pc_out == 16) else
+      begin
+        error_count = error_count + 1;
+        $display("\nTest %2d Failed!", test_count);
+        $display("PC did not jump correctly on successful branch");
+        $display("Expected: %3d\tActual: %3d\n", 16, c0.pc_out);        
+      end
+    test_count = test_count + 1;
+
+    // Check the PC only increments after a failed BEQ branch
+    clock();
+    assert(c0.pc_out == 17) else
+      begin
+        error_count = error_count + 1;
+        $display("\nTest %2d Failed!", test_count);
+        $display("PC did not increment correctly after failed BEQ branch");
+        $display("Expected: %3d\tActual: %3d\n", 17, c0.pc_out);        
+      end
+    test_count = test_count + 1;
+
+    // Check next clock causes successful BNE branch
+    assert(c0.pc_relbranch == 1'b1 && c0.pc_incr == 1'b0) else
+      begin
+        error_count = error_count + 1;
+        $display("\nTest %2d Failed!", test_count);
+        $display("pc_relbranch was not set on successful branch");       
+      end
+    test_count = test_count + 1;
+
+    clock();
+
+    assert(c0.pc_out == 21) else
+      begin
+        error_count = error_count + 1;
+        $display("\nTest %2d Failed!", test_count);
+        $display("PC did not jump correctly on successful branch");
+        $display("Expected: %3d\tActual: %3d\n", 21, c0.pc_out);        
+      end
+    test_count = test_count + 1;
+    //-------------END BRANCHING TEST---------------//
+
+
+    //---------BRANCH ON SWITCH INPUT TEST----------//
+    // Set SW[8] to 0, check PC will stay at same value
+    #1000 sw[8] = 1'b0;
+
+    clock();
+
+    assert(c0.pc_out == 21)
+      begin
+        error_count = error_count + 1;
+        $display("\nTest %2d Failed!", test_count);
+        $display("PC did not loop waiting for SW[8] -> 1");
+        $display("Expected: %3d\tActual: %3d\n", 21, c0.pc_out);   
+      end
+    test_count = test_count + 1;
+
+    // Set SW[8] to 1, check PC will now carry on
+    #1000 sw[8] = 1'b1;
+
+    clock();
+
+    assert(c0.pc_out == 22)
+      begin
+        error_count = error_count + 1;
+        $display("\nTest %2d Failed!", test_count);
+        $display("PC did not continue after SW[8] -> 1");
+        $display("Expected: %3d\tActual: %3d\n", 22, c0.pc_out);   
+      end
+    test_count = test_count + 1;
+
+    // Check PC will now loop waiting for SW[8] -> 1
+    clock();
+
+    assert(c0.pc_out == 22)
+      begin
+        error_count = error_count + 1;
+        $display("\nTest %2d Failed!", test_count);
+        $display("PC did not loop waiting for SW[8] -> 0");
+        $display("Expected: %3d\tActual: %3d\n", 22, c0.pc_out);   
+      end
+    test_count = test_count + 1;
+
+    // Set SW[8] to 0, check PC will now carry on
+    #1000 sw[8] = 1'b0;
+
+    clock();
+
+    assert(c0.pc_out == 23)
+      begin
+        error_count = error_count + 1;
+        $display("\nTest %2d Failed!", test_count);
+        $display("PC did not continue after SW[8] -> 0");
+        $display("Expected: %3d\tActual: %3d\n", 23, c0.pc_out);   
+      end
+    test_count = test_count + 1;
+
+    //------END BRNANCH ON SWITCH INPUT TEST--------//
 
     if (error_count == 0) $display("No errors were recorded!");
     else                  $error("%1d errors were reported!", error_count);
