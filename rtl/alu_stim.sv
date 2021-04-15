@@ -16,7 +16,8 @@ logic [n-1:0] a, b;
 logic [2:0] func;
 logic [1:0] a_sel, b_sel;
 logic [8:0] switches;
-logic [7:0] immidiate;
+logic [7:0] immediate;
+logic imm;
  
 // alu output
 logic [3:0] flags;
@@ -30,9 +31,10 @@ alu alu0 (
     .a_sel(a_sel),
     .b_sel(b_sel),
     .switches(switches),
-    .immidiate(immidiate),
+    .immediate(immediate),
     .flags(flags), 
-    .result(result)
+    .result(result),
+    .imm(imm)
   );
 
 // Error and test counter
@@ -70,10 +72,11 @@ task reset_inputs();
   b = 0;
 
   switches = 0;
-  immidiate = 0;
+  immediate = 0;
   
   a_sel = `REG;
   b_sel = `REG;
+  imm = 1'b0;
 endtask
 
 initial 
@@ -129,12 +132,6 @@ initial
 
     switches[8] = 1; 
     check_alu_output(`RA, -24, 45, 8'b11111111, 4'b0100);
-    
-    // Check immidiate DOESN'T propagate to output
-    a_sel = `IMM;
-
-    immidiate = 8'b00001111;
-    check_alu_output(`RA, -24, 45, -24, 4'b0100);
 
     //----------END RA EXTRA INPUTS-------//
 
@@ -156,10 +153,10 @@ initial
     switches[8] = 1; 
     check_alu_output(`RB, -24, 45, 8'b11111111, 4'b0100);
 
-    // Check Immidiate DOES propagate to output
-    b_sel = `IMM;
+    // Check immediate DOES propagate to output
+    imm = 1'b1;
 
-    immidiate = 8'b00001111;
+    immediate = 8'b00001111;
     check_alu_output(`RB, -24, 45, 8'b00001111, 4'b0000);
     //----------END RB EXTRA INPUTS-------//
 
@@ -167,9 +164,11 @@ initial
 
     //-------------TEST IMM ADD-----------//
     a_sel = `REG;
-    b_sel = `IMM;
+    b_sel = `REG;
 
-    immidiate = -5;
+    imm = 1'b1;
+
+    immediate = -5;
 
     check_alu_output(`RADD, 125, 3, 120, 4'b0001);
     //----------END TEST IMM ADD----------//

@@ -3,7 +3,8 @@
 // Function : picoMIPS 32 x n registers, %0 == 0
 // Version 1 :
 // Author: tjk
-// Last rev. 27 Oct 2012
+// Modified by: Peter Alexander
+// Last rev. 25 March 2021
 //-----------------------------------------------------
 module regs #(parameter n = 8) // n - data bus width
 (input logic clk, w, n_reset, // clk and write control

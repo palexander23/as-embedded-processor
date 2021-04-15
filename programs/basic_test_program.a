@@ -37,6 +37,6 @@ NOP
 NOP
 
 # Branch on switch input Test
-BEQ %2 %0 -1             # Loop on this instruction until SW[8] > 1
+BEQ %2 %0 0             # Loop on this instruction until SW[8] > 0
 BNE %2 %0 0             # Loop on this instruction until SW[8] == 0
 

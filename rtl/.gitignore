@@ -13,3 +13,4 @@ ncverilog*
 *.qws
 *.history
 *.log
+*.diag

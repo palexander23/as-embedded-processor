@@ -18,4 +18,3 @@
 `define REG     2'b00
 `define SW_7_0  2'b01
 `define SW_8    2'b10
-`define IMM     2'b11

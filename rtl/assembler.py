@@ -5,6 +5,13 @@
  Author           :   Peter Alexander
  Last rev. 26 Mar 2021
 -----------------------------------------------------
+
+Usage:
+======
+The application software can be compiled from this directory on cadteaching7 
+using the following command:
+
+python3 ./assembler.py ../programs/application_software.a
 """
 
 from os import error

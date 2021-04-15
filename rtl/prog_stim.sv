@@ -1,16 +1,18 @@
 module prog_stim #(parameter p_size = 6, i_size = 24);
 
+timeunit 1ns; timeprecision 10ps;
+
 // prog inputs
 logic [p_size-1:0] address;
 
 // prog outputs
-logic [i_size:0] instr;
+logic [i_size-1:0] instr;
 
 // prog instance
-prog p0 (.*);
+prog p0 (.address(address), .instr(instr));
 
 // Place to store local copy of program for comparison
-logic [i_size:0] prog_mem[ (1<<p_size)-1:0];
+logic [i_size-1:0] prog_mem[ (1<<p_size)-1:0];
 
 // Error and test counters
 integer error_count;
