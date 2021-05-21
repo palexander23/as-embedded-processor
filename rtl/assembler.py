@@ -15,6 +15,7 @@ python3 ./assembler.py ../programs/application_software.a
 """
 
 from os import error
+from math import ceil
 import sys
 
 def get_opcodes() -> dict:
@@ -191,12 +192,18 @@ def bin_to_hex(binary_token_list: list):
     for token_line in binary_token_list:
         # Combine binary tokens into one string
         binary_string = "".join(token_line)
+        
+        # Find the number of hex digits needed to store the binary string
+        hex_len = ceil(len(binary_string)/4)
+
+        # Generate a format string used later to produce the hex string
+        format_string = "{{:0{}X}}".format(hex_len)
 
         # Convert binary string to int representation
         int_representation = int(binary_string, base=2)
 
         # Format int representation as hex string
-        hex_string = "{:06X}".format(int_representation)
+        hex_string = format_string.format(int_representation)
 
         hex_list.append(hex_string)
         bin_string_list.append(binary_string)
