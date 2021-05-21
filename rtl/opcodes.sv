@@ -5,10 +5,7 @@
 // Last rev. 24 Mar 2021
 //-----------------------------------------------------
 
-`define NOP     6'b000000
-`define ADDI    6'b101010
-`define ADD     6'b100010
-`define MULL    6'b100100
-`define BEQ     6'b010011
-`define BNE     6'b011011
-`define MOV     6'b110001
+`define ACCI 2'b00
+`define MACI 2'b01
+`define BEQ  2'b10
+`define BNE  2'b11

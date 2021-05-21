@@ -28,6 +28,26 @@ cpu #(.n(n)) c0 (
   .LED(leds)
 );
 
+// Extract interesting internal signals
+logic signed[7:0] mult_out, add_out, immediate;
+logic signed[7:0] rd_data, rs_data;
+logic signed[7:0] w_data;
+logic signed[7:0] switches;
+logic signed[7:0] acc_out;
+logic[4:0] rd, rs;
+
+assign mult_out = c0.as_alu0.mult_out;
+assign add_out = c0.as_alu0.add_out;
+assign rd_data = c0.as_alu0.rd_data;
+assign rs_data = c0.as_alu0.rs_data;
+assign switches = SW[7:0];
+assign w_data = c0.as_alu0.w_data;
+assign acc_out = c0.as_alu0.acc_out; 
+assign immediate = c0.instr[n-1:0];
+assign rd = c0.rd;
+assign rs = c0.rs;
+
+
 // Error and test counters
 integer error_count;
 integer test_count;
@@ -48,6 +68,33 @@ task reset_system();
   #1000 n_reset = 0;
   #1000 n_reset = 1;
 
+endtask
+
+// Define new test function
+task new_test();
+  test_count = test_count + 1;
+endtask
+
+// Define error function
+task log_error();
+  input string error_message;
+  begin 
+    $display("\nTest number %2d Failed!", test_count);
+    $display(error_message);
+    $display("\n");
+    $display("                 rd: %3d %8b\t       rs: %3d %8b", rd, rd, rs, rs);
+    $display("            rd_data: %3d %8b\t  rs_data: %3d %8b", rd_data, rd_data, rs_data, rs_data);
+    $display("          immediate: %3d %8b\t ", immediate, immediate);
+    $display("            SW[7:0]: %3d %8b\t n{SW[8]}: %3d %8b", switches[7:0], switches[7:0], {n{switches[8]}}, {n{switches[8]}});
+    $display("\n");
+    $display("             w_data: %3d %8b", w_data, w_data);
+    $display("            acc_out: %3d %8b", acc_out, acc_out);
+    $display("           mult_out: %3d %8b\t  add_out: %3d %8b", mult_out, mult_out, add_out, add_out);
+    $display("\n");
+
+    error_count = error_count + 1;
+
+  end
 endtask
 
 initial 
@@ -81,474 +128,85 @@ initial
           $display("Register %2d\tExpected: %8b\tActual: %8b\n", i, 0, c0.r0.gpr[i]);
         end
     end
-    test_count = test_count + 1; 
     //---------------END RESET TEST-----------------//
 
-    //-------------------INSTR 1--------------------//
-    // Check ALU output is 60
-    assert(c0.alu_result == 60 && leds == 60) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("ALU output was not 60 before first instruction clock");
-        $display("Expected: %8b\tActual: %8b\n", 60, c0.alu_result);
-      end
-      test_count = test_count + 1; 
+    //----------------INSTRUCTION 1-----------------//
 
-    // Run the first instruction
-    clock();
-    
-    // Check PC has incremented
-    assert(c0.pc_out == 1) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("PC did not increment on first instruction");
-        $display("Expected: %8b\tActual: %8b\n", 1, c0.pc_out);
-      end
-      test_count = test_count + 1; 
-
-    // Check %3 is now at 60
-    assert(c0.r0.gpr[3] == 60) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("R3 did not go to 60 after instruction 1 was clocked");
-        $display("Expected: %8b\tActual: %8b\n", 60, c0.r0.gpr[3]);
-      end
-      test_count = test_count + 1; 
-    //-----------------END INSTR 1------------------//
-
-
-    //-------------------INSTR 2--------------------//
-    // Check ALU output is 54
-    assert(c0.alu_result == 54 && leds == 54) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("ALU output was not 54 before 2nd instruction clock");
-        $display("Expected: %8b\tActual: %8b\n", 54, c0.alu_result);
-      end
-      test_count = test_count + 1; 
-
-    // Run the first instruction
-    clock();
-    
-    // Check PC has incremented
-    assert(c0.pc_out == 2) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("PC did not increment on 2nd instruction");
-        $display("Expected: %8b\tActual: %8b\n", 2, c0.pc_out);
-      end
-      test_count = test_count + 1; 
-
-    // Check %3 is now at 60
-    assert(c0.r0.gpr[4] == 54) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("R4 did not go to 54 after instruction 2 was clocked");
-        $display("Expected: %8b\tActual: %8b\n", 54, c0.r0.gpr[4]);
-      end
-      test_count = test_count + 1; 
-    //-----------------END INSTR 2------------------//
-
-
-    //-------------------INSTR 3--------------------//
-    // Check ALU output is 114
-    assert(c0.alu_result == 114 && leds == 114) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("ALU output was not 114 before 3rd instruction clock");
-        $display("Expected: %8b\tActual: %8b\n", 114, c0.alu_result);
-      end
-      test_count = test_count + 1; 
-
-    // Run the first instruction
-    clock();
-    
-    // Check PC has incremented
-    assert(c0.pc_out == 3) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("PC did not increment on 3nd instruction");
-        $display("Expected: %8b\tActual: %8b\n", 3, c0.pc_out);
-      end
-      test_count = test_count + 1; 
-
-    // Check %3 is now at 60
-    assert(c0.r0.gpr[3] == 114) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("R3 did not go to 54 after instruction 2 was clocked");
-        $display("Expected: %8b\tActual: %8b\n", 114, c0.r0.gpr[3]);
-      end
-      test_count = test_count + 1; 
-    //-----------------END INSTR 3------------------//
-
-
-    //-------------------INSTR 4--------------------//
-    // Check ALU output is 0
-    assert(c0.alu_result == 0 && leds == 0) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("ALU output was not 114 before 3rd instruction clock");
-        $display("Expected: %8b\tActual: %8b\n", 0, c0.alu_result);
-      end
-      test_count = test_count + 1; 
-
-    // Run the first instruction
-    clock();
-    
-    // Check PC has incremented
-    assert(c0.pc_out == 4) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("PC did not increment on 4th instruction");
-        $display("Expected: %8b\tActual: %8b\n", 4, c0.pc_out);
-      end
-      test_count = test_count + 1; 
-
-    // Check %3 is now at 60
-    assert(c0.r0.gpr[3] == 114) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("R3 did not go to 114 after instruction 2 was clocked");
-        $display("Expected: %8b\tActual: %8b\n", 114, c0.r0.gpr[3]);
-      end
-      test_count = test_count + 1; 
-    //-----------------END INSTR 4------------------//
-
-
-    //-------------------INSTR 4--------------------//
-    // Check ALU output is 65
-    assert(c0.alu_result == 65 && leds == 65) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("ALU output was not 114 before 3rd instruction clock");
-        $display("Expected: %8b\tActual: %8b\n", 65, c0.alu_result);
-      end
-      test_count = test_count + 1; 
-
-    // Run the first instruction
-    clock();
-    
-    // Check PC has incremented
-    assert(c0.pc_out == 5) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("PC did not increment on 3nd instruction");
-        $display("Expected: %8b\tActual: %8b\n", 5, c0.pc_out);
-      end
-      test_count = test_count + 1; 
-
-    // Check %3 is now at 60
-    assert(c0.r0.gpr[3] == 65) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("R3 did not go to 65 after instruction 2 was clocked");
-        $display("Expected: %8b\tActual: %8b\n", 65, c0.r0.gpr[3]);
-      end
-      test_count = test_count + 1; 
-    //-----------------END INSTR 4------------------//
-
-
-    //-------------------INSTR 5--------------------//
-    // Set SW[7:0] to 30 and read switches into R5
-    #1000 sw[7:0] = 8'b00011110;
-
-    #1000 assert(c0.alu_result == 30 && leds == 30) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("ALU output was not 30 before 5th instruction clock");
-        $display("Expected: %8b\tActual: %8b\n", 30, c0.alu_result);
-      end
-      test_count = test_count + 1; 
-
-    // Run the first instruction
-    clock();
-    
-    // Check PC has incremented
-    assert(c0.pc_out == 6) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("PC did not increment on 3nd instruction");
-        $display("Expected: %8b\tActual: %8b\n", 6, c0.pc_out);
-      end
-      test_count = test_count + 1; 
-
-    assert(c0.r0.gpr[5] == 30) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("R5 did not go to 30 after instruction 5 was clocked");
-        $display("Expected: %8b\tActual: %8b\n", 30, c0.r0.gpr[5]);
-      end
-      test_count = test_count + 1; 
-    //-----------------END INSTR 5------------------//
-
-
-    //-------------------INSTR 6--------------------//
-    // Set SW[7:0] to 30 and read switches into R5
-    #1000 sw[7:0] = -3;
-
-    #1000 assert(c0.alu_result == 8'b11111101 && leds == 8'b11111101) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("ALU output was not -3 before 6th instruction clock");
-        $display("Expected: %8b\tActual: %8b\n", -3, c0.alu_result);
-      end
-      test_count = test_count + 1; 
-
-    // Run the first instruction
-    clock();
-    
-    // Check PC has incremented
-    assert(c0.pc_out == 7) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("PC did not increment on 6th instruction");
-        $display("Expected: %8b\tActual: %8b\n", 7, c0.pc_out);
-      end
-      test_count = test_count + 1; 
-
-    assert(c0.r0.gpr[6] == 8'b11111101) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("R6 did not go to 30 after instruction 6 was clocked");
-        $display("Expected: %8b\tActual: %8b\n", 8'b11111101, c0.r0.gpr[6]);
-      end
-      test_count = test_count + 1; 
-    //-----------------END INSTR 6------------------//
-
-
-    //-------------------INSTR 7--------------------//
-    // Set SW[8] to 1 and read it into %7
-    #1000 sw[8] = 1'b1;
-
-    #1000 assert(c0.alu_result == 8'b11111111 && leds == 8'b11111111) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("ALU output was not -3 before 6th instruction clock");
-        $display("Expected: %8b\tActual: %8b\n", 8'b11111111, c0.alu_result);
-      end
-      test_count = test_count + 1; 
-
-    // Run the first instruction
-    clock();
-    
-    // Check PC has incremented
-    assert(c0.pc_out == 8) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("PC did not increment on 6th instruction");
-        $display("Expected: %8b\tActual: %8b\n", 8, c0.pc_out);
-      end
-      test_count = test_count + 1; 
-
-    assert(c0.r0.gpr[7] == 8'b11111111) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("R6 did not go to 111111111 after instruction 7 was clocked");
-        $display("Expected: %8b\tActual: %8b\n", 8'b11111111, c0.r0.gpr[7]);
-      end
-      test_count = test_count + 1; 
-    //-----------------END INSTR 7------------------//
-
-
-    //-------------------INSTR 8--------------------//
-    // Multiply R6(-3) and R5(30) and place in R6(-90)
-
-     assert(c0.alu_result == 8'b10100110 && leds == 8'b10100110) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("ALU output was not -90 before 7th instruction clock");
-        $display("Expected: %8b\tActual: %8b\n", 8'b10100110, c0.alu_result);
-      end
-      test_count = test_count + 1; 
-
-    // Run the first instruction
-    clock();
-    
-    // Check PC has incremented
-    assert(c0.pc_out == 9) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("PC did not increment on 8th instruction");
-        $display("Expected: %8b\tActual: %8b\n", 9, c0.pc_out);
-      end
-      test_count = test_count + 1; 
-
-    assert(c0.r0.gpr[6] == 8'b10100110) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("R6 did not go to 8'b10100110 after instruction 8 was clocked");
-        $display("Expected: %8b\tActual: %8b\n", 8'b10100110, c0.r0.gpr[6]);
-      end
-      test_count = test_count + 1; 
-    //-----------------END INSTR 8------------------//
-
-
-    //----------------BRANCHING TEST----------------//
-    // Clock three times to perform three ADDI instructions
-    clock();
-    clock();
-    // Check the PC is where it should be 
-    assert(c0.pc_out == 11) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("PC was not at expected value before branching tests");
-        $display("Expected: %3d\tActual: %3d\n", 11, c0.pc_out);        
-      end
-    test_count = test_count + 1;
-
-    // Check clocking only increments PC
-    clock();
-    assert(c0.pc_out == 12) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("PC did not increment correctly after failed BNE branch");
-        $display("Expected: %3d\tActual: %3d\n", 12, c0.pc_out);        
-      end
-    test_count = test_count + 1;
-
-    // Check next clock causes successful BEQ branch
-    assert(c0.pc_relbranch == 1'b1 && c0.pc_incr == 1'b0) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("pc_relbranch was not set on successful branch");       
-      end
-    test_count = test_count + 1;
+    new_test();
+    // Run first instruction 
+    #1000 assert(add_out == 45) else
+      log_error("Instruction 1: ACC 45 setup failed");
 
     clock();
 
-    assert(c0.pc_out == 16) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("PC did not jump correctly on successful branch");
-        $display("Expected: %3d\tActual: %3d\n", 16, c0.pc_out);        
-      end
-    test_count = test_count + 1;
+    new_test();
+    #1000 assert(acc_out == 45) else
+      log_error("Instruction 1: ACC 45 execution failed");
+    //-------------END INSTRUCTION 1----------------//
 
-    // Check the PC only increments after a failed BEQ branch
-    clock();
-    assert(c0.pc_out == 17) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("PC did not increment correctly after failed BEQ branch");
-        $display("Expected: %3d\tActual: %3d\n", 17, c0.pc_out);        
-      end
-    test_count = test_count + 1;
+    //----------------INSTRUCTION 2-----------------//
 
-    // Check next clock causes successful BNE branch
-    assert(c0.pc_relbranch == 1'b1 && c0.pc_incr == 1'b0) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("pc_relbranch was not set on successful branch");       
-      end
-    test_count = test_count + 1;
+    new_test();
+    // Run first instruction 
+    #1000 assert(add_out == -12) else
+      log_error("Instruction 2: ACC -12 setup failed");
 
     clock();
 
-    assert(c0.pc_out == 21) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("PC did not jump correctly on successful branch");
-        $display("Expected: %3d\tActual: %3d\n", 21, c0.pc_out);        
-      end
-    test_count = test_count + 1;
-    //-------------END BRANCHING TEST---------------//
+    new_test();
+    #1000 assert(acc_out == -12) else
+      log_error("Instruction 2: ACC -12 execution failed");
+    //-------------END INSTRUCTION 2----------------//
 
+    //----------------INSTRUCTION 3-----------------//
 
-    //---------BRANCH ON SWITCH INPUT TEST----------//
-    // Set SW[8] to 0, check PC will stay at same value
-    #1000 sw[8] = 1'b0;
+    new_test();
+    // Run first instruction 
+    sw[7:0] = 4;
+    #1000 assert(w_data == 4 && add_out == 2) else
+      log_error("Instruction 3: ACCI %2 %1 2 setup failed");
 
     clock();
 
-    assert(c0.pc_out == 21) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("PC did not loop waiting for SW[8] -> 1");
-        $display("Expected: %3d\tActual: %3d\n", 21, c0.pc_out);   
-      end
-    test_count = test_count + 1;
+    new_test();
+    #1000 assert(c0.r0.gpr[2] == 4 && acc_out == 2) else
+      log_error("Instruction 3: ACCI %2 %1 2 execution failed");
+    //-------------END INSTRUCTION 3----------------//
 
-    // Set SW[8] to 1, check PC will now carry on
-    #1000 sw[8] = 1'b1;
+    //----------------INSTRUCTION 4-----------------//
 
-    clock();
-
-    assert(c0.pc_out == 22) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("PC did not continue after SW[8] -> 1");
-        $display("Expected: %3d\tActual: %3d\n", 22, c0.pc_out);   
-      end
-    test_count = test_count + 1;
-
-    // Check PC will now loop waiting for SW[8] -> 1
-    clock();
-
-    assert(c0.pc_out == 22) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("PC did not loop waiting for SW[8] -> 0");
-        $display("Expected: %3d\tActual: %3d\n", 22, c0.pc_out);   
-      end
-    test_count = test_count + 1;
-
-    // Set SW[8] to 0, check PC will now carry on
-    #1000 sw[8] = 1'b0;
+    new_test();
+    // Run first instruction 
+    sw[7:0] = 17;
+    #1000 assert(w_data == 17 && add_out == 3) else
+      log_error("Instruction 4: ACCI %2 %1 2 setup failed");
 
     clock();
 
-    assert(c0.pc_out == 23) else
-      begin
-        error_count = error_count + 1;
-        $display("\nTest %2d Failed!", test_count);
-        $display("PC did not continue after SW[8] -> 0");
-        $display("Expected: %3d\tActual: %3d\n", 23, c0.pc_out);   
-      end
-    test_count = test_count + 1;
+    new_test();
+    #1000 assert(c0.r0.gpr[23] == 17 && acc_out == 3) else
+      log_error("Instruction 4: ACCI %23 %1 3 execution failed");
+    //-------------END INSTRUCTION 4----------------//
 
-    //------END BRNANCH ON SWITCH INPUT TEST--------//
+    //----------------INSTRUCTION 5-----------------//
+
+    new_test();
+    // Run first instruction 
+    sw[7:0] = 17;
+    #1000 assert(add_out == 0) else
+      log_error("Instruction 5: MACI %0 %2 6 setup failed");
+
+    clock();
+
+    new_test();
+    #1000 assert(acc_out == 0) else
+      log_error("Instruction 5: MACI %0 %2 6 3 execution failed");
+    //-------------END INSTRUCTION 5----------------//
+
 
     if (error_count == 0) $display("No errors were recorded!");
     else                  $error("%1d errors were reported!", error_count);
 
 
-  end
+  end 
 endmodule

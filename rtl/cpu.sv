@@ -7,7 +7,7 @@
 
 `include "alucodes.sv"
 
-module cpu #( parameter n = 8, p_size = 6, i_size = 24)
+module cpu #( parameter n = 8, p_size = 6, i_size = 20)
 (input logic clk,
     input logic [9:0] SW,
     output logic [n-1:0] LED);
@@ -23,13 +23,15 @@ assign n_reset = SW[9];
 // Registers
 logic w;
 logic [n-1:0] Rd_data, Rs_data;
+logic [n-1:0] w_data;
 
 // ALU
-logic [2:0] alu_func;
-logic [1:0] a_sel, b_sel;
-logic [3:0] alu_flags;
-logic [n-1:0] alu_result;
-logic imm;
+logic add_a_sel, add_b_sel;
+logic acc_en, acc_add;
+logic in_en;
+
+logic z;
+logic [n-1:0] acc_out;
 
 // PC 
 logic pc_incr, pc_relbranch;
@@ -38,14 +40,21 @@ logic [p_size-1:0] pc_out;
 // Program Memory
 logic [i_size-1:0] instr;
 
+// Extract operands
+logic[4:0] rd, rs;
+
+assign rd = instr[i_size-3:i_size-7];
+assign rs = instr[i_size-8:i_size-12];
+
 decoder d0 (
-    .opcode(instr[i_size-1:i_size-6]),
-    .alu_flags(alu_flags),
-    .alu_func(alu_func),
+    .opcode(instr[i_size-1:i_size-2]),
+    .z(z),
+    .acc_en(acc_en),
+    .acc_add(acc_add),
+    .in_en(in_en),
     .w(w),
     .pc_incr(pc_incr),
-    .pc_relbranch(pc_relbranch),
-    .imm(imm)
+    .pc_relbranch(pc_relbranch)
 );
 
 // Instantiate Modules
@@ -58,26 +67,30 @@ pc #(.p_size(p_size)) pc0 (
     .pc_out(pc_out)
 );
 
-alu #(.n(n)) alu0 (
-    .a_in(Rd_data),
-    .b_in(Rs_data),
-    .func(alu_func),
-    .a_sel(a_sel),
-    .b_sel(b_sel),
-    .switches(SW[8:0]),
+as_alu #(.n(n)) as_alu0 (
+    .rd_data(Rd_data),
+    .rs_data(Rs_data),
     .immediate(instr[n-1:0]),
-    .flags(alu_flags),
-    .result(alu_result),
-    .imm(imm)
+    .add_a_sel(add_a_sel),
+    .add_b_sel(add_b_sel),
+    .switches(SW),
+    .acc_en(acc_en),
+    .acc_add(acc_add),
+    .in_en(in_en),
+    .clk(clk),
+    .n_reset(n_reset),
+    .z(z),
+    .w_data(w_data),
+    .acc_out(acc_out)
 );
 
 regs #(8) r0 (
     .clk(clk),
     .w(w),
     .n_reset(n_reset),
-    .w_data(alu_result),
-    .Rd(instr[i_size-7:i_size-11]),
-    .Rs(instr[i_size-12:i_size-16]),
+    .w_data(w_data),
+    .Rd(rd),
+    .Rs(rs),
     .Rd_data(Rd_data),
     .Rs_data(Rs_data)
 );
@@ -89,24 +102,21 @@ prog #(.p_size(p_size), .i_size(i_size)) prog0 (
 
 always_comb 
   begin
-    // ALU A input selection
-    case(instr[i_size-7:i_size-11])
-        5'b00001: a_sel = `SW_7_0;
-        5'b00010: a_sel = `SW_8;
+    // ALU adder A input selection
+    if(rd == 1)
+        add_a_sel = 1;
+    else
+        add_a_sel = 0;
 
-        default: a_sel = `REG;
-    endcase
+    // ALU adder B input selection
+    if(rs == 1)
+        add_b_sel = 1;
+    else
+        add_b_sel = 0;
 
-    // ALU B input selection
-    case(instr[i_size-12:i_size-16])
-        5'b00001: b_sel = `SW_7_0;
-        5'b00010: b_sel = `SW_8;
-
-        default: b_sel = `REG;
-    endcase
   end
 
 // Route ALU output to LEDs
-assign LED = alu_result;
+assign LED = acc_out;
 
 endmodule
