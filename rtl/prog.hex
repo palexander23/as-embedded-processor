@@ -1,8 +1,17 @@
-0012D		//00000000000100101101	ACCI %0 %1 45                       # Set ACC to 45
-001F4		//00000000000111110100	ACCI %0 %1 -12                      # Set ACC to -12
-04102		//00000100000100000010	ACCI %2 %1 2                        # Load SW[7:0] into %2, set ACC to 2
-06103		//00000110000100000011	ACCI %3 %1 3                        # Load SW[7:0] into %3, set ACC to 3
-40260		//01000000001001100000	MACI %0 %2 b01100000                # ACC should go to ACC + %2*imm = 3 + 4*0.75 = 6
-483E0		//01001000001111100000	MACI %4 %3 b11100000                # ACC and %6 should go to ACC + %3*imm = 6 + 28*-0.25 = -1 
-82000		//10000010000000000000	BEQ %1 %0 0                         # Hold until SW[8] goes to not 0
-C2000		//11000010000000000000	BNE %1 %0 0                         # Hold until SW[8] goes to 0
+82000		//10000010000000000000	BEQ  %1 %0 0            # Wait while SW[8] == 0
+04000		//00000100000000000000	ACCI %2 %0 0            # Read SW[7:0] into %2
+C2000		//11000010000000000000	BNE  %1 %0 0            # Wait while SW[8] != 0
+82000		//10000010000000000000	BEQ  %1 %0 0            # Wait while SW[8] == 0
+06100		//00000110000100000000	ACCI %3 %1 0            # Read SW[7:0] into %3
+C2000		//11000010000000000000	BNE  %1 %0 0            # Wait while SW[8] != 0
+00105		//00000000000100000101	ACCI %0 %1 5            # Set ACC to 5
+40260		//01000000001001100000	MACI %0 %2 b01100000    # Add a11*x1 to ACC
+48340		//01001000001101000000	MACI %4 %3 b01000000    # Add a12*y1 to ACC to give x2. Save to %4
+0010C		//00000000000100001100	ACCI %0 %1 12           # Load b2 into ACC
+402C0		//01000000001011000000	MACI %0 %2 b11000000    # Add a21*x1 to ACC
+46360		//01000110001101100000	MACI %3 %3 b01100000    # Add a22*y1 to ACC to give y2. Save to %3
+08100		//00001000000100000000	ACCI %4 %1 0            # Write x2 to ACC for display
+82000		//10000010000000000000	BEQ  %1 %0 0            # Wait for SW[8] to become 1
+06100		//00000110000100000000	ACCI %3 %1 0            # Write y2 to ACC for dislpay
+C2000		//11000010000000000000	BNE  %1 %0 0            # Wait for SW[8] to go to 0 
+800F0		//10000000000011110000	BEQ %0 %0 -16

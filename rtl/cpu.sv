@@ -73,7 +73,7 @@ as_alu #(.n(n)) as_alu0 (
     .immediate(instr[n-1:0]),
     .add_a_sel(add_a_sel),
     .add_b_sel(add_b_sel),
-    .switches(SW),
+    .switches(SW[8:0]),
     .acc_en(acc_en),
     .acc_add(acc_add),
     .in_en(in_en),

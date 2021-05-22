@@ -52,11 +52,13 @@ always_comb
       `BEQ:   if(z == 1'b1) begin       // If ALU Zero flag is set
         pc_incr = 1'b0;                 // Enable relative branching in PC
         pc_relbranch = 1'b1;
+        acc_en = 1'b0;
       end
 
       `BNE:   if(z == 1'b0) begin       // If ALU Zero flag is NOT set
         pc_incr = 1'b0;                 // Enable relative branching in PC
         pc_relbranch = 1'b1;
+        acc_en = 1'b0;
       end
 
       default:  $error("Unimplemented Opcode: %6d", opcode);

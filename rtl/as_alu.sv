@@ -34,7 +34,7 @@ always_ff @(posedge clk, negedge n_reset)
   begin: ACC
     if (!n_reset)
       acc_out <= {n{1'b0}};
-    else
+    else if(acc_en)
       acc_out <= add_out;
   end // always_ff ACC
 

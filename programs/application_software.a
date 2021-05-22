@@ -7,23 +7,33 @@
 # A handshaking protocol is implemented using SW[8] one of the switches and the 
 # result of the output is displayed on the FPGA LEDs, routed from the ALU output.
 
-ADDI  %8 %0 0       # Set R8 = 0
-                    # Not strictly necessary as n_reset sets all registers to 0.
+# Load x1 into %2
+BEQ  %1 %0 0            # Wait while SW[8] == 0
+ACCI %2 %0 0            # Read SW[7:0] into %2
 
-# Loop:
-# Get first number
-BEQ  %2 %0 0        # Hold here until SW[8] becomes 1
-MOV  %6 %1          # Input an 8-bit number from SW[7:0] to R6
+# Load y1 into %3
+BNE  %1 %0 0            # Wait while SW[8] != 0
+BEQ  %1 %0 0            # Wait while SW[8] == 0
+ACCI %3 %1 0            # Read SW[7:0] into %3
 
-# Get second number
-BNE  %2 %0 0        # Hold here until SW[8] becomes 0
-BEQ  %2 %0 0        # Hold here until SW[8] becomes 1
-MOV  %5 %1          # Input an 8-bit number from S[7:0] to R5 
+BNE  %1 %0 0            # Wait while SW[8] != 0
 
-# Perform MAC operation
-MULL %6 %5          # R6 = R5*R6
-ADD  %8 %6          # R8 = R6+R6 = R8 + R5*R6
+# Compute x2
+ACCI %0 %1 5            # Set ACC to 5
+MACI %0 %2 b01100000    # Add a11*x1 to ACC
+MACI %4 %3 b01000000    # Add a12*y1 to ACC to give x2. Save to %4
 
-# Perform final handshake and return to beginning of the loop
-BNE  %2 %0 0        # Hold here until SW[8] becomes 0
-BEQ  %0 %0 -8       # Unconditional branch to beginning of the loop
+# Compute y2
+ACCI %0 %1 12           # Load b2 into ACC
+MACI %0 %2 b11000000    # Add a21*x1 to ACC
+MACI %3 %3 b01100000    # Add a22*y1 to ACC to give y2. Save to %3
+
+# Display x2
+ACCI %4 %1 0            # Write x2 to ACC for display
+BEQ  %1 %0 0            # Wait for SW[8] to become 1
+
+ACCI %3 %1 0            # Write y2 to ACC for dislpay
+BNE  %1 %0 0            # Wait for SW[8] to go to 0 
+
+# Loop back to start 
+BEQ %0 %0 -16

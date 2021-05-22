@@ -16,7 +16,5 @@ work/**
 *.history
 *.log
 *.diag
-*.mpf
-*.mti
 *.wlf
 *.bak
