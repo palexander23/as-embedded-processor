@@ -163,13 +163,21 @@ def token_to_bin(tokens, opcode_dict):
         if len(token_line) < 4:
             imm_bin = "{:08b}".format(0)
         else:
-            imm = int(token_line[3])
+            imm_str = token_line[3]
 
-            # Format the immediate value in 2's compliment
-            if imm < 0:
-                imm_bin = "{:08b}".format(255 + imm + 1)
-            else:   
-                imm_bin = "{:08b}".format(imm)
+            # Binary formatted immediate
+            if imm_str[0] == 'b':
+                imm_bin = imm_str.replace('b', '')
+            
+            # Decimal formatted immediate
+            else:
+                imm = int(imm_str)
+
+                # Format the immediate value in 2's compliment
+                if imm < 0:
+                    imm_bin = "{:08b}".format(255 + imm + 1)
+                else:   
+                    imm_bin = "{:08b}".format(imm)
 
         binary_token_line.append(imm_bin)
 
