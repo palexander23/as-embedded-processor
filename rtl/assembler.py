@@ -151,10 +151,10 @@ def token_to_bin(tokens, opcode_dict):
 
         # Convert the register values to binary strings
         rd = token_line[1][1:]
-        rd_bin = "{:05b}".format(int(rd))
+        rd_bin = "{:03b}".format(int(rd))
 
         rs = token_line[2][1:]
-        rs_bin = "{:05b}".format(int(rs))
+        rs_bin = "{:03b}".format(int(rs))
 
         binary_token_line.append(rd_bin)
         binary_token_line.append(rs_bin)
