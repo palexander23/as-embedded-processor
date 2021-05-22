@@ -19,7 +19,7 @@ logic signed [(2*n)-1:0] full_mult_out;                 // Full 16-bit output of
 logic signed [n-1:0] mult_out;                          // Bits [14:7] of the mult output   
 
 assign full_mult_out = rs_data * immediate;             // Multiplier definition
-assign mult_out = full_mult_out[(2*n)-1:(2*n)-9];       // Only take the integer part of the mult result
+assign mult_out = full_mult_out[(2*n)-2:(2*n)-9];       // Only take the integer part of the mult result
 
 
 // Define adder and associated temporary variables
