@@ -30,6 +30,8 @@ cpu #(.n(n)) c0 (
 
 // Extract interesting internal signals
 logic signed[7:0] mult_out, add_out, immediate;
+logic signed[15:0] full_mult_out;
+logic signed[7:0] add_a_in, add_b_in;
 logic signed[7:0] rd_data, rs_data;
 logic signed[7:0] w_data;
 logic signed[7:0] switches;
@@ -37,7 +39,10 @@ logic signed[7:0] acc_out;
 logic[4:0] rd, rs;
 
 assign mult_out = c0.as_alu0.mult_out;
+assign full_mult_out = c0.as_alu0.full_mult_out;
 assign add_out = c0.as_alu0.add_out;
+assign add_a_in = c0.as_alu0.add_a_in;
+assign add_b_in = c0.as_alu0.add_b_in;
 assign rd_data = c0.as_alu0.rd_data;
 assign rs_data = c0.as_alu0.rs_data;
 assign switches = SW[7:0];
@@ -76,8 +81,7 @@ task new_test();
 endtask
 
 // Define error function
-task log_error();
-  input string error_message;
+task log_error(string error_message);
   begin 
     $display("\nTest number %2d Failed!", test_count);
     $display(error_message);
@@ -86,10 +90,12 @@ task log_error();
     $display("            rd_data: %3d %8b\t  rs_data: %3d %8b", rd_data, rd_data, rs_data, rs_data);
     $display("          immediate: %3d %8b\t ", immediate, immediate);
     $display("            SW[7:0]: %3d %8b\t n{SW[8]}: %3d %8b", switches[7:0], switches[7:0], {n{switches[8]}}, {n{switches[8]}});
+    $display("           add_a_in: %3d %8b\t add_b_in: %3d %8b", add_a_in, add_a_in, add_b_in, add_b_in);
     $display("\n");
     $display("             w_data: %3d %8b", w_data, w_data);
     $display("            acc_out: %3d %8b", acc_out, acc_out);
     $display("           mult_out: %3d %8b\t  add_out: %3d %8b", mult_out, mult_out, add_out, add_out);
+    $display("      full_mult_out:%4d %16b", full_mult_out, full_mult_out);
     $display("\n");
 
     error_count = error_count + 1;
@@ -133,7 +139,6 @@ initial
     //----------------INSTRUCTION 1-----------------//
 
     new_test();
-    // Run first instruction 
     #1000 assert(add_out == 45) else
       log_error("Instruction 1: ACC 45 setup failed");
 
@@ -147,7 +152,6 @@ initial
     //----------------INSTRUCTION 2-----------------//
 
     new_test();
-    // Run first instruction 
     #1000 assert(add_out == -12) else
       log_error("Instruction 2: ACC -12 setup failed");
 
@@ -161,7 +165,6 @@ initial
     //----------------INSTRUCTION 3-----------------//
 
     new_test();
-    // Run first instruction 
     sw[7:0] = 4;
     #1000 assert(w_data == 4 && add_out == 2) else
       log_error("Instruction 3: ACCI %2 %1 2 setup failed");
@@ -176,32 +179,42 @@ initial
     //----------------INSTRUCTION 4-----------------//
 
     new_test();
-    // Run first instruction 
-    sw[7:0] = 17;
-    #1000 assert(w_data == 17 && add_out == 3) else
+    sw[7:0] = 28;
+    #1000 assert(w_data == 28 && add_out == 3) else
       log_error("Instruction 4: ACCI %2 %1 2 setup failed");
 
     clock();
 
     new_test();
-    #1000 assert(c0.r0.gpr[23] == 17 && acc_out == 3) else
+    #1000 assert(c0.r0.gpr[3] == 28 && acc_out == 3) else
       log_error("Instruction 4: ACCI %23 %1 3 execution failed");
     //-------------END INSTRUCTION 4----------------//
 
     //----------------INSTRUCTION 5-----------------//
 
     new_test();
-    // Run first instruction 
-    sw[7:0] = 17;
-    #1000 assert(add_out == 0) else
-      log_error("Instruction 5: MACI %0 %2 6 setup failed");
+    sw[7:0] = 0;
+    #1000 assert(add_out == 6) else
+      log_error("Instruction 5: MACI %0 %2 b01100000 setup failed");
 
     clock();
 
     new_test();
-    #1000 assert(acc_out == 0) else
-      log_error("Instruction 5: MACI %0 %2 6 3 execution failed");
+    #1000 assert(acc_out == 6) else
+      log_error("Instruction 5: MACI %0 %2 b01100000 execution failed");
     //-------------END INSTRUCTION 5----------------//
+
+    //----------------INSTRUCTION 6-----------------//
+    new_test();
+    #1000 assert(add_out == -1) else
+      log_error("Instruction 5: MACI %0 %3 b11100000 setup failed");
+
+    clock();
+
+    new_test();
+    #1000 assert(acc_out == -1) else
+      log_error("Instruction 5: MACI %0 %3 b11100000 execution failed");
+    //-------------END INSTRUCTION 6----------------//
 
 
     if (error_count == 0) $display("No errors were recorded!");

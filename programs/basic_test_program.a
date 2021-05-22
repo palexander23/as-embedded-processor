@@ -8,12 +8,12 @@ ACCI %0 %1 45                       # Set ACC to 45
 ACCI %0 %1 -12                      # Set ACC to -12
 
 # Test ACCI function SW[7:0] load 
-ACCI %2 %1 2                        # Load SW[7:0] into %2
-ACCI %23 %1 3                        # Load SW[7:0] into %3
+ACCI %2 %1 2                        # Load SW[7:0] into %2, set ACC to 2
+ACCI %3 %1 3                        # Load SW[7:0] into %3, set ACC to 3
 
 # Test MACI function
-MACI %0 %2 6                        # ACC should go to -12 + 6*4 = 0
-MACI %0 %3 5                        # ACC should go to 0 + 3*5 = 15
+MACI %0 %2 b01100000                # ACC should go to ACC + %2*imm = 3 + 4*0.75 = 6
+MACI %0 %3 b11100000                # ACC should go to ACC + %3*imm = 6 + 28*-0.25 = -1
 
 # Test wait on SW[8]
 BEQ %0 %1 0                         # Hold until SW[8] goes to not 0
