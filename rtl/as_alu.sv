@@ -1,15 +1,15 @@
 module as_alu #(parameter n = 8) (
-    input logic [n-1:0] rd_data, rs_data, immediate,    // Numerical inputs
-    input logic add_a_sel, add_b_sel,                   // Input selectors
-    input logic [8:0] switches,                         // External input switches
-    input logic acc_en,                                 // ACC write enable
-    input logic acc_add,                                // Route ACC back to adder
-    input logic in_en,                                  // Route SW[7:0] to writeback bus
-    input logic clk, n_reset,                           // Synchronising signals for ACC
+    input logic signed [n-1:0] rd_data, rs_data, immediate,   // Numerical inputs
+    input logic add_a_sel, add_b_sel,                         // Input selectors
+    input logic [8:0] switches,                               // External input switches
+    input logic acc_en,                                       // ACC write enable
+    input logic acc_add,                                      // Route ACC back to adder
+    input logic in_en,                                        // Route SW[7:0] to writeback bus
+    input logic clk, n_reset,                                 // Synchronising signals for ACC
 
-    output logic z,                                     // Zero flag from ALU
-    output logic [n-1:0] w_data,                        // Regs w_data
-    output logic [n-1:0] acc_out                        // ACC output for LEDs
+    output logic z,                                           // Zero flag from ALU
+    output logic [n-1:0] w_data,                              // Regs w_data
+    output logic [n-1:0] acc_out                              // ACC output for LEDs
 );
 
 timeunit 1ns; timeprecision 10ps;
@@ -19,7 +19,7 @@ logic signed [(2*n)-1:0] full_mult_out;                 // Full 16-bit output of
 logic signed [n-1:0] mult_out;                          // Bits [14:7] of the mult output   
 
 assign full_mult_out = rs_data * immediate;             // Multiplier definition
-assign mult_out = full_mult_out[14:7];                  // Only take the integer part of the mult result
+assign mult_out = full_mult_out[(2*n)-1:(2*n)-9];       // Only take the integer part of the mult result
 
 
 // Define adder and associated temporary variables
