@@ -9,8 +9,14 @@ waves.shm/**
 
 ncverilog*
 
+work/**
+
 *.qsf
 *.qws
 *.history
 *.log
 *.diag
+*.mpf
+*.mti
+*.wlf
+*.bak
