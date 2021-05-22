@@ -207,14 +207,46 @@ initial
     //----------------INSTRUCTION 6-----------------//
     new_test();
     #1000 assert(add_out == -1) else
-      log_error("Instruction 5: MACI %0 %3 b11100000 setup failed");
+      log_error("Instruction 6: MACI %0 %3 b11100000 setup failed");
 
     clock();
 
     new_test();
     #1000 assert(acc_out == -1) else
-      log_error("Instruction 5: MACI %0 %3 b11100000 execution failed");
+      log_error("Instruction 6: MACI %0 %3 b11100000 execution failed");
     //-------------END INSTRUCTION 6----------------//
+
+    //----------------INSTRUCTION 7-----------------//
+    new_test();
+    #1000 assert(c0.pc0.r_branch == 0 && c0.z == 1) else
+      log_error("Instruction 7: BEQ %0 %1 0 does not hold for sw[8] == 0");
+
+    sw[8] = 1'b1;
+    #1000 assert(c0.pc0.r_branch == 1 && c0.z == 0) else
+      log_error("Instruction 7: BEQ %0 %1 0 holds for sw[8] == 1");
+
+    clock();
+
+    new_test();
+    #1000 assert(c0.pc0.pc_out == 7) else
+      log_error("Instruction 7: BEQ %0 %1 0 with sw[8] == 1 execution failed");
+    //-------------END INSTRUCTION 7----------------//
+
+    //----------------INSTRUCTION 8-----------------//
+    new_test();
+    sw[8] = 1'b1;
+    #1000 assert(c0.pc0.r_branch == 0 && c0.z == 0) else
+      log_error("Instruction 8: BNE %1 %0 0 does not hold for sw[8] == 0");
+    sw[8] = 1'b0;
+    #1000 assert(c0.pc0.r_branch == 1 && c0.z == 1) else
+      log_error("Instruction 8: BNE %1 %0 0 holds for sw[8] == 1");
+
+    clock();
+
+    new_test();
+    #1000 assert(c0.pc0.pc_out == 8) else
+      log_error("Instruction 8: BNE %1 %0 0 with sw[8] == 1 execution failed");
+    //-------------END INSTRUCTION 8----------------//
 
 
     if (error_count == 0) $display("No errors were recorded!");
