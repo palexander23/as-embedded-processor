@@ -13,7 +13,7 @@ ACCI %3 %1 3                        # Load SW[7:0] into %3, set ACC to 3
 
 # Test MACI function
 MACI %0 %2 b01100000                # ACC should go to ACC + %2*imm = 3 + 4*0.75 = 6
-MACI %0 %3 b11100000                # ACC should go to ACC + %3*imm = 6 + 28*-0.25 = -1
+MACI %4 %3 b11100000                # ACC and %6 should go to ACC + %3*imm = 6 + 28*-0.25 = -1 
 
 # Test wait on SW[8]
 BEQ %1 %0 0                         # Hold until SW[8] goes to not 0

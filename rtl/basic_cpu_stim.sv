@@ -181,13 +181,13 @@ initial
     new_test();
     sw[7:0] = 28;
     #1000 assert(w_data == 28 && add_out == 3) else
-      log_error("Instruction 4: ACCI %2 %1 2 setup failed");
+      log_error("Instruction 4: ACCI %3 %1 3 setup failed");
 
     clock();
 
     new_test();
     #1000 assert(c0.r0.gpr[3] == 28 && acc_out == 3) else
-      log_error("Instruction 4: ACCI %23 %1 3 execution failed");
+      log_error("Instruction 4: ACCI %3 %1 3 execution failed");
     //-------------END INSTRUCTION 4----------------//
 
     //----------------INSTRUCTION 5-----------------//
@@ -206,14 +206,14 @@ initial
 
     //----------------INSTRUCTION 6-----------------//
     new_test();
-    #1000 assert(add_out == -1) else
-      log_error("Instruction 6: MACI %0 %3 b11100000 setup failed");
+    #1000 assert(add_out == -1 && w_data == -1 && c0.w == 1) else
+      log_error("Instruction 6: MACI %4 %3 b11100000 setup failed");
 
     clock();
 
     new_test();
-    #1000 assert(acc_out == -1) else
-      log_error("Instruction 6: MACI %0 %3 b11100000 execution failed");
+    #1000 assert(acc_out == -1 && c0.r0.gpr[4] == -1) else
+      log_error("Instruction 6: MACI %6 %3 b11100000 execution failed");
     //-------------END INSTRUCTION 6----------------//
 
     //----------------INSTRUCTION 7-----------------//

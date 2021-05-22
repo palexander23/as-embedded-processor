@@ -46,6 +46,7 @@ always_comb
       `MACI: begin
         acc_en = 1'b1;
         acc_add = 1'b1;
+        w = 1'b1;
       end      
       
       `BEQ:   if(z == 1'b1) begin       // If ALU Zero flag is set

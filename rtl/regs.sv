@@ -16,7 +16,7 @@ module regs #(parameter n = 8) // n - data bus width
 timeunit 1ns; timeprecision 10ps;
 
 // Declare 32 n-bit registers 
-logic [n-1:0] gpr [31:0];
+logic signed [n-1:0] gpr [31:0];
 
 
 // write process, dest reg is Raddr2

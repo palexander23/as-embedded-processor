@@ -3,6 +3,6 @@
 04102		//00000100000100000010	ACCI %2 %1 2                        # Load SW[7:0] into %2, set ACC to 2
 06103		//00000110000100000011	ACCI %3 %1 3                        # Load SW[7:0] into %3, set ACC to 3
 40260		//01000000001001100000	MACI %0 %2 b01100000                # ACC should go to ACC + %2*imm = 3 + 4*0.75 = 6
-403E0		//01000000001111100000	MACI %0 %3 b11100000                # ACC should go to ACC + %3*imm = 6 + 28*-0.25 = -1
+483E0		//01001000001111100000	MACI %4 %3 b11100000                # ACC and %6 should go to ACC + %3*imm = 6 + 28*-0.25 = -1 
 82000		//10000010000000000000	BEQ %1 %0 0                         # Hold until SW[8] goes to not 0
 C2000		//11000010000000000000	BNE %1 %0 0                         # Hold until SW[8] goes to 0
