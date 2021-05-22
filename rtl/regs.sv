@@ -9,14 +9,14 @@
 module regs #(parameter n = 8) // n - data bus width
 (input logic clk, w, n_reset, // clk and write control
  input logic [n-1:0] w_data,
- input logic [4:0] Rd, Rs,
+ input logic [2:0] Rd, Rs,
  output logic [n-1:0] Rd_data, Rs_data);
 
   
 timeunit 1ns; timeprecision 10ps;
 
 // Declare 32 n-bit registers 
-logic signed [n-1:0] gpr [31:0];
+logic signed [n-1:0] gpr [4:0];
 
 
 // write process, dest reg is Raddr2

@@ -7,7 +7,7 @@
 
 `include "alucodes.sv"
 
-module cpu #( parameter n = 8, p_size = 6, i_size = 20)
+module cpu #( parameter n = 8, p_size = 6, i_size = 16)
 (input logic clk,
     input logic [9:0] SW,
     output logic [n-1:0] LED);
@@ -41,10 +41,10 @@ logic [p_size-1:0] pc_out;
 logic [i_size-1:0] instr;
 
 // Extract operands
-logic[4:0] rd, rs;
+logic[2:0] rd, rs;
 
-assign rd = instr[i_size-3:i_size-7];
-assign rs = instr[i_size-8:i_size-12];
+assign rd = instr[i_size-3:i_size-5];
+assign rs = instr[i_size-6:i_size-8];
 
 decoder d0 (
     .opcode(instr[i_size-1:i_size-2]),
