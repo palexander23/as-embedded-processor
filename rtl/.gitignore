@@ -19,3 +19,5 @@ work/**
 *.wlf
 *.bak
 *.mti
+
+./transcript/**

@@ -68,8 +68,7 @@ task new_test();
 endtask
 
 // Define error function
-task log_error();
-  input string error_message;
+task log_error(string error_message);
   begin 
     $display("\nTest number %2d Failed!", test_count);
     $display(error_message);

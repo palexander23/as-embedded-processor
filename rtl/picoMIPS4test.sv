@@ -19,11 +19,11 @@ module picoMIPS4test(
   // clock it 2^24 times to get the program to progress.
   // The macro TESTBENCH_CLOCK can be defined in the testbench to bypass 
   // The clock divider.
-  `ifdef TESTBENCH_CLOCK
+  //`ifdef TESTBENCH_CLOCK
     cpu c0 (.clk(fastclk), .SW(SW),.LED(LED));
-  `else
-    cpu c0 (.clk(clk), .SW(SW),.LED(LED));
-  `endif 
+  //`else
+  //  cpu c0 (.clk(clk), .SW(SW),.LED(LED));
+  //`endif 
     
   
 endmodule  
