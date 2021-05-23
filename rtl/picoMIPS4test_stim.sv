@@ -43,18 +43,19 @@ endtask // reset
 
 
 task run_affine_operation(logic signed [7:0] x1, y1, x2, y2);
-    gp_sw[7:0] = x1; // Apply first input 
-    gp_sw[8] = 1;      // Signal a new input is ready
+    gp_sw[7:0] = x1;        // Apply first input 
+    gp_sw[8] = 1;           // Signal a new input is ready
 
-    clock();                 // Clock that input in 
+    clock();                // Clock that input in 
     clock();
 
-    gp_sw[7:0] = y1; // Apply second input
-    gp_sw[8] = 0;      // Signal new input is ready
+    gp_sw[7:0] = y1;        // Apply second input
+
+    gp_sw[8] = 0;           // Signal new input is ready
     clock();
     #1000 gp_sw[8] = 1;
-
     clock();
+
     clock();                // Clock that input in
     
     gp_sw[8] = 0;
@@ -62,13 +63,11 @@ task run_affine_operation(logic signed [7:0] x1, y1, x2, y2);
 
     clock();
     clock();
-    clock();                // Compute x2
-
-    clock();
-    clock();
     clock();                // Compute y2
 
-    clock();                // Display x2
+    clock();
+    clock();
+    clock();                // Compute and display x2
 
     // Check output is correct 
     #1000 assert (LED == x2) else

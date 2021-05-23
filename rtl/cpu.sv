@@ -7,7 +7,7 @@
 
 `include "alucodes.sv"
 
-module cpu #( parameter n = 8, p_size = 5, i_size = 16)
+module cpu #( parameter n = 8, p_size = 4, i_size = 16)
 (input logic clk,
     input logic [9:0] SW,
     output logic [n-1:0] LED);
