@@ -1,3 +1,5 @@
+""" A quick script for generating some Affine Transformation test data"""
+
 a11 = 0.75
 a12 = 0.5
 a21 = -0.5 
